@@ -1,4 +1,5 @@
-import { Component, NgModule, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -11,6 +12,10 @@ import { ListboxModule } from 'primeng/listbox';
 import { Fragment } from './interfaces/fragment.interface';
 import { Condition } from './interfaces/condition.interface';
 import { Usuario } from './interfaces/usuario.interface';
+import { UsuariosService } from './db/usuarios.service';
+import { HttpClientModule } from '@angular/common/http';
+import { UsuariosDataService } from './db/usuarios-data.service';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'app-root',
@@ -25,25 +30,18 @@ import { Usuario } from './interfaces/usuario.interface';
     InputTextModule,
     ReactiveFormsModule,
     ListboxModule,
+    DialogModule,
+    HttpClientModule,
   ],
+  providers: [UsuariosService, UsuariosDataService],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
   title = 'Fragmentacion-h-v';
   formGroup: FormGroup = new FormGroup({});
-  usuarios: Usuario[] = [
-    {
-      IdUsuario: 1,
-      No_control: '12345678',
-      Nombre: 'Juan Perez',
-      Domicilio: 'Calle 1',
-      Ciudad: 'Ciudad 1',
-      Edad: 20,
-      Oficio: 'Estudiante',
-    },
-  ];
-  tiposFragmento: Fragment[] = [
+  users: Observable<Usuario[]>;
+  fragmentTypes: Fragment[] = [
     { name: 'No_control' },
     { name: 'Nombre' },
     { name: 'Domicilio' },
@@ -51,7 +49,7 @@ export class AppComponent implements OnInit {
     { name: 'Edad' },
     { name: 'Oficio' },
   ];
-  tiposCondicion: Condition[] = [
+  conditionTypes: Condition[] = [
     { name: '<' },
     { name: '>' },
     { name: '<=' },
@@ -59,30 +57,64 @@ export class AppComponent implements OnInit {
     { name: '=' },
     { name: '<>' },
   ];
-  tipoFragmento: string[] = [];
-  tipoCondicion: string[] = [];
-  tipoDato: string = '';
+  fragmentType: string[] = [];
+  conditionType: string[] = [];
+  inputCondition: string = '';
   fragmentos: any[] = []; // Aquí debes definir la estructura de tus fragmentos
 
+  queryBuilded = '';
+
+  showModal: boolean = false;
   columns: any[] = [];
 
-  constructor() {
-    for (const property in this.usuarios[0]) {
-      if (this.usuarios[0].hasOwnProperty(property)) {
-        this.columns.push({ field: property, header: property });
-      }
-    }
-  }
+  constructor(private _usuariosService: UsuariosService) {}
 
   ngOnInit() {
+    this._usuariosService.getUsers();
+    this.updateData();
+
     this.formGroup = new FormGroup({
       conditionGroup: new FormControl(),
       fragmentGroup: new FormControl(),
     });
+
+    this.users.subscribe((data) => {
+      this.columns = [];
+      for (const property in data[0]) {
+        if (data[0].hasOwnProperty(property)) {
+          this.columns.push({ field: property, header: property });
+        }
+      }
+    });
   }
 
-  actualizarTabla() {
-    // Aquí debes implementar la lógica para actualizar la tabla en función de los filtros seleccionados
-    // Puedes realizar una solicitud HTTP para obtener los datos actualizados
+  resetData() {
+    this._usuariosService.getUsers();
+    this.updateData();
+  }
+
+  updateTable() {
+    if (
+      this.formGroup.value.conditionGroup != null &&
+      this.formGroup.value.fragmentGroup != null &&
+      this.inputCondition != ''
+    ) {
+      let fragmentSelected = this.formGroup.value.fragmentGroup.name;
+      let conditionSelected = this.formGroup.value.conditionGroup.name;
+      this.queryBuilded = `WHERE ${fragmentSelected} ${conditionSelected}`;
+      this.queryBuilded +=
+        typeof this.inputCondition === 'string'
+          ? ` '${this.inputCondition}'`
+          : ` ${this.inputCondition}}`;
+      this._usuariosService.generateQuery(this.queryBuilded);
+      alert(this.queryBuilded);
+      this.updateData();
+    } else {
+      alert('Faltan datos');
+    }
+  }
+
+  updateData() {
+    this.users = this._usuariosService.currentUsers$;
   }
 }

@@ -3,7 +3,19 @@
   margin: 0 auto;
   padding: 20px;
   border-radius: 5px;
-
+  .top__buttons {
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    .top__buttons__left {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+  }
   .filters__container {
     display: flex;
     justify-content: space-between;
@@ -25,6 +37,10 @@
       justify-content: space-between;
       flex-direction: column;
       gap: 10px;
+
+      .f__c__input__button {
+        width: 100%;
+      }
     }
   }
 }

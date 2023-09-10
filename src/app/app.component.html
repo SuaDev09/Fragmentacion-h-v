@@ -1,12 +1,33 @@
 <div class="main-container">
+  <p-dialog header="Header" [(visible)]="showModal" [style]="{ width: '50vw' }">
+    <p>{{ queryBuilded }}</p>
+    <ng-template pTemplate="footer">
+      <p-button
+        icon="pi pi-check"
+        (click)="showModal = false"
+        label="Ok"
+        styleClass="p-button-text"
+      ></p-button>
+    </ng-template>
+  </p-dialog>
+
   <h1>Fragmentación de Datos</h1>
 
   <div class="top__buttons">
-    <button pButton label="Frag. Horizontal"></button>
-    <button pButton label="Frag. Vertical"></button>
+    <div class="top__buttons__left">
+      <p-button label="Frag. Horizontal"></p-button>
+      <p-button label="Frag. Vertical"></p-button>
+    </div>
+    <div class="top__button_right">
+      <p-button
+        styleClass="p-button-outlined"
+        label="Reiniciar filtros"
+        (onClick)="resetData()"
+      ></p-button>
+    </div>
   </div>
   <div class="table__container">
-    <p-table [value]="usuarios">
+    <p-table [value]="(users | async)!">
       <ng-template pTemplate="header">
         <tr>
           <th *ngFor="let column of columns">{{ column.header }}</th>
@@ -25,7 +46,7 @@
       <h3>Fragmento:</h3>
       <form [formGroup]="formGroup">
         <p-listbox
-          [options]="tiposFragmento"
+          [options]="fragmentTypes"
           formControlName="fragmentGroup"
           optionLabel="name"
         ></p-listbox>
@@ -35,7 +56,7 @@
       <h3>Condicion:</h3>
       <form [formGroup]="formGroup">
         <p-listbox
-          [options]="tiposCondicion"
+          [options]="conditionTypes"
           formControlName="conditionGroup"
           optionLabel="name"
         ></p-listbox>
@@ -46,10 +67,10 @@
       <input
         type="text"
         pInputText
-        [(ngModel)]="tipoDato"
-        placeholder="Tipo de Dato"
+        [(ngModel)]="inputCondition"
+        placeholder="Valor de la condicion"
       />
-      <button pButton label="Actualizar" (click)="actualizarTabla()"></button>
+      <button pButton label="Actualizar" (click)="updateTable()"></button>
     </div>
   </div>
 </div>

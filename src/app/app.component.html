@@ -1,0 +1,55 @@
+<div class="main-container">
+  <h1>Fragmentación de Datos</h1>
+
+  <div class="top__buttons">
+    <button pButton label="Frag. Horizontal"></button>
+    <button pButton label="Frag. Vertical"></button>
+  </div>
+  <div class="table__container">
+    <p-table [value]="usuarios">
+      <ng-template pTemplate="header">
+        <tr>
+          <th *ngFor="let column of columns">{{ column.header }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-usuario>
+        <tr>
+          <td *ngFor="let column of columns">{{ usuario[column.field] }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <div class="filters__container">
+    <div class="f__c__checkbox__group">
+      <h3>Fragmento:</h3>
+      <form [formGroup]="formGroup">
+        <p-listbox
+          [options]="tiposFragmento"
+          formControlName="fragmentGroup"
+          optionLabel="name"
+        ></p-listbox>
+      </form>
+    </div>
+    <div class="f__c__checkbox__group">
+      <h3>Condicion:</h3>
+      <form [formGroup]="formGroup">
+        <p-listbox
+          [options]="tiposCondicion"
+          formControlName="conditionGroup"
+          optionLabel="name"
+        ></p-listbox>
+      </form>
+    </div>
+
+    <div class="f__c__input">
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="tipoDato"
+        placeholder="Tipo de Dato"
+      />
+      <button pButton label="Actualizar" (click)="actualizarTabla()"></button>
+    </div>
+  </div>
+</div>

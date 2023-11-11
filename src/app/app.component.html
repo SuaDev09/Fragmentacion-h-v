@@ -74,3 +74,18 @@
     </div>
   </div>
 </div>
+
+<div class="table__container">
+  <p-table [value]="(cars | async)!">
+    <ng-template pTemplate="header">
+      <tr>
+        <th *ngFor="let column of columnsCars">{{ column.header }}</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-car>
+      <tr>
+        <td *ngFor="let column of columnsCars">{{ car[column.field] }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

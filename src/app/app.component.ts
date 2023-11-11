@@ -16,6 +16,8 @@ import { UsuariosService } from './db/usuarios.service';
 import { HttpClientModule } from '@angular/common/http';
 import { UsuariosDataService } from './db/usuarios-data.service';
 import { DialogModule } from 'primeng/dialog';
+import Car from './interfaces/car.interface';
+import { CarsService } from './db/cars.service';
 
 @Component({
   selector: 'app-root',
@@ -41,6 +43,7 @@ export class AppComponent implements OnInit {
   title = 'Fragmentacion-h-v';
   formGroup: FormGroup = new FormGroup({});
   users: Observable<Usuario[]>;
+  cars: Observable<Car[]>;
   fragmentTypes: Fragment[] = [
     { name: 'No_control' },
     { name: 'Nombre' },
@@ -66,11 +69,16 @@ export class AppComponent implements OnInit {
 
   showModal: boolean = false;
   columns: any[] = [];
+  columnsCars: any[] = [];
 
-  constructor(private _usuariosService: UsuariosService) {}
+  constructor(
+    private _usuariosService: UsuariosService,
+    private _carsService: CarsService
+  ) {}
 
   ngOnInit() {
     this._usuariosService.getUsers();
+    this._carsService.getCars();
     this.updateData();
 
     this.formGroup = new FormGroup({
@@ -83,6 +91,15 @@ export class AppComponent implements OnInit {
       for (const property in data[0]) {
         if (data[0].hasOwnProperty(property)) {
           this.columns.push({ field: property, header: property });
+        }
+      }
+    });
+
+    this.cars.subscribe((data) => {
+      this.columnsCars = [];
+      for (const property in data[0]) {
+        if (data[0].hasOwnProperty(property)) {
+          this.columnsCars.push({ field: property, header: property });
         }
       }
     });
@@ -116,5 +133,6 @@ export class AppComponent implements OnInit {
 
   updateData() {
     this.users = this._usuariosService.currentUsers$;
+    this.cars = this._carsService.currentCars$;
   }
 }
